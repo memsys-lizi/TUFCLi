@@ -18,7 +18,15 @@
     "terminal",
     "downloader"
   ],
-  "author": "",
+  "author": {
+    "name": "memsyslizi",
+    "email": "1433185301@qq.com",
+    "url": "https://github.com/memsys-lizi"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/memsys-lizi/TUFCLi"
+  },
   "license": "MIT",
   "type": "module",
   "dependencies": {
