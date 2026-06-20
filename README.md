@@ -31,6 +31,9 @@ npm install
 npm run dev -- search "关键词"
 npm run dev -- search "Arche" --limit 5
 npm run dev -- search "Camellia" --sort likes --order desc
+
+# JSON 输出（适合其他程序调用）
+npm run dev -- search "Arche" --limit 5 --json
 ```
 
 **参数说明：**
@@ -46,6 +49,7 @@ npm run dev -- search "Camellia" --sort likes --order desc
   - `duration` - 按时长
   - `random` - 随机排序
 - `--order, -o` (可选) - 排序方式：`asc`(升序), `desc`(降序)，默认 `desc`
+- `--json` (可选) - 输出 JSON 格式，适合程序化调用
 
 **高级搜索技巧：**
 ```bash
@@ -172,11 +176,15 @@ npm run dev -- info 14370 --json
 ```bash
 npm run dev -- download 14370
 npm run dev -- download 14370 --output ~/Downloads/ADOFAI
+
+# JSON 输出（适合其他程序调用）
+npm run dev -- download 14370 --json
 ```
 
 **参数说明：**
 - `id` (必填) - 关卡 ID
 - `--output, -o` (可选) - 输出目录，默认 `~/Downloads/TUFCLi`
+- `--json` (可选) - 输出 JSON 格式（`{ success: true, filePath: "..." }` 或 `{ success: false, error: "..." }`）
 
 **下载说明：**
 - 文件会保存为 ZIP 格式
@@ -187,10 +195,14 @@ npm run dev -- download 14370 --output ~/Downloads/ADOFAI
 ```bash
 npm run dev -- popular
 npm run dev -- popular --limit 20
+
+# JSON 输出（适合其他程序调用）
+npm run dev -- popular --limit 20 --json
 ```
 
 **参数说明：**
 - `--limit, -l` (可选) - 显示结果数量，默认 10
+- `--json` (可选) - 输出 JSON 格式，适合程序化调用
 
 返回格式同搜索命令，按下载量降序排列。
 
@@ -373,10 +385,62 @@ $ npm run dev -- download 14370
 Saved to: C:\Users\YourName\Downloads\TUFCLi\Arche.zip
 ```
 
+## JSON 输出模式
+
+所有命令都支持 `--json` 参数，用于程序化调用。JSON 模式下：
+- 不会输出彩色文本和 emoji
+- 只输出结构化的 JSON 数据到 stdout
+- 错误时返回 `{ "error": "错误信息" }` 并以退出码 1 退出
+- 成功时返回对应的数据对象
+
+**示例：**
+```bash
+# 搜索并解析 JSON
+result=$(npm run dev -- search "Arche" --limit 1 --json 2>/dev/null)
+echo $result | jq '.results[0].song'
+
+# 获取关卡详情
+npm run dev -- info 14940 --json | jq '.downloadUrl'
+
+# 下载关卡并获取路径
+npm run dev -- download 14940 --json | jq '.filePath'
+```
+
+## API 请求优化
+
+为了避免触发上游 API 的频率限制，工具内置了以下优化：
+
+### 1. 自动重试机制
+- **最大重试次数**: 3 次
+- **首次重试延迟**: 2 秒
+- **延迟倍增系数**: 2x（即 2秒 → 4秒 → 8秒）
+
+当遇到 `Network Error: No response from server` 时，会自动重试最多 3 次。
+
+### 2. 请求延迟
+每次 API 请求前会自动延迟 500ms，避免请求过快触发频率限制。
+
+### 3. 超时设置
+- **请求超时**: 120 秒
+- **最大重定向**: 5 次
+
+**实现代码：**
+```typescript
+// src/services/api.ts
+const RETRY_CONFIG = {
+  maxRetries: 3,          // 最大重试次数
+  retryDelay: 2000,       // 重试间隔（毫秒）
+  retryDelayMultiplier: 2 // 重试延迟倍增系数
+}
+
+// 每次请求前延迟 500ms
+await delay(500)
+```
+
 ## 常见问题
 
 **Q: 为什么搜索或获取详情时超时？**
-A: TUF API 服务器可能响应较慢，工具已设置 120 秒超时。如果持续失败，请检查网络连接。
+A: TUF API 服务器可能响应较慢或触发了频率限制。工具已内置自动重试机制（最多重试 3 次），如果仍然失败，请稍后再试。
 
 **Q: 下载的文件如何使用？**
 A: 下载的 ZIP 文件解压后，将文件夹放入 ADOFAI 的自定义关卡目录即可。
