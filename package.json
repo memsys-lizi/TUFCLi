@@ -1,21 +1,20 @@
 {
   "name": "tufcli",
   "version": "1.0.0",
-  "description": "TUF Level Downloader - A beautiful TUI for The Universal Forums",
+  "description": "TUF Level Downloader - A simple CLI for The Universal Forums",
   "main": "dist/cli.js",
   "bin": {
-    "tufcli": "./dist/cli.js",
-    "TUFCLI": "./dist/cli.js"
+    "tufcli": "./dist/cli.js"
   },
   "scripts": {
-    "dev": "tsx src/cli.tsx",
+    "dev": "tsx src/cli.ts",
     "build": "tsc",
     "start": "node dist/cli.js"
   },
   "keywords": [
     "tuf",
     "adofai",
-    "tui",
+    "cli",
     "terminal",
     "downloader"
   ],
@@ -24,17 +23,9 @@
   "type": "module",
   "dependencies": {
     "@types/node": "^26.0.0",
-    "@types/react": "^19.2.17",
     "axios": "^1.18.0",
     "chalk": "^5.6.2",
     "commander": "^15.0.0",
-    "fuzzysort": "^3.1.0",
-    "ink": "^7.1.0",
-    "ink-box": "^1.0.0",
-    "ink-select-input": "^6.2.0",
-    "ink-spinner": "^5.0.0",
-    "ink-text-input": "^6.0.0",
-    "react": "^19.2.7",
     "tsx": "^4.22.4",
     "typescript": "^6.0.3"
   }
