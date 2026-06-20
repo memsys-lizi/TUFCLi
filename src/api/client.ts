@@ -2,7 +2,7 @@ import axios from 'axios';
 
 const client = axios.create({
   baseURL: 'https://api.tuforums.com',
-  timeout: 30000,
+  timeout: 60000, // 增加到 60 秒
   headers: {
     'Content-Type': 'application/json',
   },
@@ -14,7 +14,8 @@ client.interceptors.response.use(
   (error) => {
     if (error.response) {
       // Server responded with error status
-      throw new Error(`API Error: ${error.response.data?.message || error.message}`);
+      const message = error.response.data?.message || error.response.statusText || error.message;
+      throw new Error(`API Error: ${message}`);
     } else if (error.request) {
       // Request made but no response
       throw new Error('Network Error: No response from server');

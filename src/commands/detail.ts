@@ -7,7 +7,8 @@ export const detailCommand = new Command('detail')
   .option('--output <format>', 'Output format (json/text)', 'json')
   .action(async (id, options) => {
     try {
-      const level = await getLevelById(parseInt(id));
+      const response = await getLevelById(parseInt(id));
+      const level = response.level;
 
       if (options.output === 'json') {
         console.log(JSON.stringify({ success: true, data: level }, null, 2));

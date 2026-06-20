@@ -1,5 +1,5 @@
 import client from './client.js';
-import { SearchParams, SearchResponse, Level } from './types.js';
+import { SearchParams, SearchResponse, Level, LevelDetailResponse } from './types.js';
 import fs from 'fs';
 import path from 'path';
 import os from 'os';
@@ -9,8 +9,8 @@ export const searchLevels = async (params: SearchParams): Promise<SearchResponse
   return response.data;
 };
 
-export const getLevelById = async (id: number): Promise<Level> => {
-  const response = await client.get<Level>(`/v2/database/levels/${id}`);
+export const getLevelById = async (id: number): Promise<LevelDetailResponse> => {
+  const response = await client.get<LevelDetailResponse>(`/v2/database/levels/${id}`);
   return response.data;
 };
 
@@ -31,7 +31,8 @@ export const getDownloadLink = (fileId: string): string => {
  */
 export const downloadLevel = async (levelId: number, outputDir?: string): Promise<string> => {
   // First, get level details to get the dlLink or fileId
-  const level = await getLevelById(levelId);
+  const response = await getLevelById(levelId);
+  const level = response.level;
   
   // Use dlLink if available (direct download link)
   let downloadUrl: string;
@@ -59,14 +60,14 @@ export const downloadLevel = async (levelId: number, outputDir?: string): Promis
   }
   
   // Download file with redirect following
-  const response = await client.get(downloadUrl, {
+  const downloadResponse = await client.get(downloadUrl, {
     responseType: 'arraybuffer',
     maxRedirects: 5, // Follow redirects
   });
   
   // Save to file
   const filePath = path.join(targetDir, filename);
-  fs.writeFileSync(filePath, response.data);
+  fs.writeFileSync(filePath, downloadResponse.data);
   
   return filePath;
 };

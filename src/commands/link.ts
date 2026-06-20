@@ -8,7 +8,8 @@ export const linkCommand = new Command('link')
   .action(async (id, options) => {
     try {
       const levelId = parseInt(id);
-      const level = await getLevelById(levelId);
+      const response = await getLevelById(levelId);
+      const level = response.level;
 
       if (!level.dlLink && !level.fileId) {
         throw new Error('No download link available for this level');

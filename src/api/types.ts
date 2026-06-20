@@ -28,6 +28,11 @@ export interface Level {
   updatedAt: string;
 }
 
+export interface LevelDetailResponse {
+  level: Level;
+  rerateHistory: any[];
+}
+
 export interface Tag {
   id: number;
   name: string;
