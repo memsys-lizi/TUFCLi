@@ -6,6 +6,7 @@ import App from './App.js';
 import { searchCommand } from './commands/search.js';
 import { detailCommand } from './commands/detail.js';
 import { downloadCommand } from './commands/download.js';
+import { linkCommand } from './commands/link.js';
 
 const program = new Command();
 
@@ -18,6 +19,7 @@ program
 program.addCommand(searchCommand);
 program.addCommand(detailCommand);
 program.addCommand(downloadCommand);
+program.addCommand(linkCommand);
 
 // Default: launch TUI
 program.action(() => {
